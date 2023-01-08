@@ -6,12 +6,11 @@ import io.javalin.Javalin;
 
 import java.util.UUID;
 
-public class HttpServer implements Runnable {
+public class HttpServer {
     private Javalin javalin;
     private final Users users = BaaastyServer.instance().users();
 
-    @Override
-    public void run() {
+    public HttpServer() {
         users.byUUID(UUID.fromString("7ccf6e1c-68fc-442d-88d0-341b315a29cd")).name("Baaasty");
 
         javalin = Javalin.create()

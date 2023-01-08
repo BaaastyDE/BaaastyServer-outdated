@@ -22,14 +22,15 @@ public class BaaastyServer {
         baaastyServer.initDatabaseConnection();
         baaastyServer.initHttpServer();
 
-        Runtime runtime = Runtime.getRuntime();
-        runtime.addShutdownHook(new Thread(baaastyServer.server::stop));
-        runtime.addShutdownHook(new Thread(baaastyServer.databaseConnection::disconnect));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            baaastyServer.server.stop();
+            baaastyServer.databaseConnection.disconnect();
+        }));
     }
 
     public void initHttpServer() {
         server = new HttpServer();
-        new Thread(server).start();
+
     }
 
     public void initDatabaseConnection() {
