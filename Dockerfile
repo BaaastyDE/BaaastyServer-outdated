@@ -5,7 +5,7 @@ WORKDIR /home/baaastyserver-build
 
 RUN gradle clean shadowJar
 
-FROM gradle:7.6.0-jdk17
+FROM azul/zulu-openjdk:17-jre-headless
 
 RUN mkdir -p /baaastyserver
 WORKDIR /baaastyserver
