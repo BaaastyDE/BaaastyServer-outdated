@@ -26,8 +26,7 @@ public class DatabaseConnection {
     }
 
     public void disconnect() {
-        if (!dataSource.isClosed())
-            dataSource.close();
+        if (!dataSource.isClosed()) dataSource.close();
     }
 
     public HikariDataSource dataSource() {

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class BaaastyServer {
     private static BaaastyServer baaastyServer;
-    private static Logger logger = LoggerFactory.getLogger(BaaastyServer.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BaaastyServer.class.getName());
     private HttpServer server;
     private DatabaseConnection databaseConnection;
     private Users users;
@@ -22,6 +22,8 @@ public class BaaastyServer {
         baaastyServer.initDatabaseConnection();
         baaastyServer.initHttpServer();
 
+        logger.info("BaaastyServer started!");
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             baaastyServer.server.stop();
             baaastyServer.databaseConnection.disconnect();
@@ -30,7 +32,6 @@ public class BaaastyServer {
 
     public void initHttpServer() {
         server = new HttpServer();
-
     }
 
     public void initDatabaseConnection() {

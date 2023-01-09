@@ -59,8 +59,7 @@ public class Meta extends QueryFactory {
                 .sendSync()
                 .changed();
 
-        if (changed)
-            this.language = language;
+        if (changed) this.language = language;
 
         return changed;
     }
@@ -106,8 +105,7 @@ public class Meta extends QueryFactory {
                 .sendSync()
                 .changed();
 
-        if (changed)
-            this.onlineTime = onlineTime;
+        if (changed) this.onlineTime = onlineTime;
 
         return changed;
     }
@@ -155,8 +153,7 @@ public class Meta extends QueryFactory {
                 .sendSync()
                 .changed();
 
-        if (changed)
-            this.lastSeen = now;
+        if (changed) this.lastSeen = now;
 
         return changed;
     }
@@ -200,8 +197,7 @@ public class Meta extends QueryFactory {
                 .sendSync()
                 .changed();
 
-        if (changed)
-            this.firstJoin = now;
+        if (changed) this.firstJoin = now;
 
         return changed;
     }

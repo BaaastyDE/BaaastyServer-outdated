@@ -74,7 +74,6 @@ public class User extends QueryFactory {
         return changed;
     }
 
-
     /**
      * Get the discord id the user
      *
@@ -110,8 +109,7 @@ public class User extends QueryFactory {
                 .sendSync()
                 .changed();
 
-        if (changed)
-            users.removeUserCache(uuid);
+        if (changed) users.removeUserCache(uuid);
 
         return changed;
     }

@@ -17,8 +17,7 @@ public class AuthHandler {
                     .withIssuer(String.valueOf(accessLevel))
                     .withExpiresAt(Instant.now().plusSeconds(86400))
                     .sign(algorithm);
-        } else
-            return "Not a valid token";
+        } else return "Not a valid token";
     }
 
     public boolean isBearerValid(String token, String name) {
@@ -41,8 +40,7 @@ public class AuthHandler {
      * @return The access level
      */
     public static int checkToken(String token) {
-        if (System.getenv("SERVER_TOKEN_ADMIN").equals(token))
-            return 99;
+        if (System.getenv("SERVER_TOKEN_ADMIN").equals(token)) return 99;
 
         return 0;
     }

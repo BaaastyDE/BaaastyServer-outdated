@@ -7,7 +7,7 @@ import io.javalin.Javalin;
 import java.util.UUID;
 
 public class HttpServer {
-    private Javalin javalin;
+    private final Javalin javalin;
     private final Users users = BaaastyServer.instance().users();
 
     public HttpServer() {
@@ -23,16 +23,27 @@ public class HttpServer {
     }
 
     private void addUserMetaRequests() {
-        javalin.get("/user/uuid/{uuid}/language", ctx -> ctx.json(
-                        users.cacheByUUID(UUID.fromString(ctx.pathParam("uuid")))
+        javalin.get("/user/uuid/{uuid}", ctx -> ctx.json(
+                        users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")))
+                ))
+                .get("/user/uuid/{uuid}/name", ctx -> ctx.json(
+                        users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")))
+                                .name()
+                ))
+                .get("/user/uuid/{uuid}/name/{name}", ctx -> ctx.json(
+                        users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")))
+                                .name(ctx.pathParam("name"))
+                ))
+                .get("/user/uuid/{uuid}/meta/language", ctx -> ctx.json(
+                        users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")))
                                 .meta()
-                                .language())
-                )
-                .get("/user/uuid/{uuid}/language/{value}", ctx -> ctx.json(
-                        users.cacheByUUID(UUID.fromString(ctx.pathParam("uuid")))
+                                .language()
+                ))
+                .get("/user/uuid/{uuid}/meta/language/{language}", ctx -> ctx.json(
+                        users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")))
                                 .meta()
-                                .language(ctx.pathParam("value")))
-                );
+                                .language(ctx.pathParam("language"))
+                ));
     }
 
     public void stop() {

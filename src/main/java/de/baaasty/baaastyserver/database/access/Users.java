@@ -26,7 +26,7 @@ public class Users extends QueryFactory {
      * @param uuid uuid of the user
      * @return user or null if no user is present
      */
-    public User cacheByUUID(UUID uuid) {
+    public User cachedByUUID(UUID uuid) {
         if (users.containsKey(uuid)) {
             return users.get(uuid);
         } else {
