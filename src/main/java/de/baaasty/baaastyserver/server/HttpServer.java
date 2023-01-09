@@ -2,8 +2,11 @@ package de.baaasty.baaastyserver.server;
 
 import de.baaasty.baaastyserver.BaaastyServer;
 import de.baaasty.baaastyserver.database.access.Users;
+import de.baaasty.baaastyserver.database.dao.User;
 import io.javalin.Javalin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class HttpServer {
@@ -23,9 +26,20 @@ public class HttpServer {
     }
 
     private void addUserMetaRequests() {
-        javalin.get("/user/uuid/{uuid}", ctx -> ctx.json(
-                        users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")))
-                ))
+        javalin.get("/user/uuid/{uuid}", ctx -> {
+                    // just a dirty example/test
+                    // i guess todo: .serialize() / .deserialize() method in user class
+
+                    User user = users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")));
+
+                    Map<String, String> userData = Map.of(
+                            "uuid", user.uuid().toString(),
+                            "name", user.name(),
+                            "discordId", String.valueOf(user.discordId())
+                    );
+
+                    ctx.json(userData);
+                })
                 .get("/user/uuid/{uuid}/name", ctx -> ctx.json(
                         users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")))
                                 .name()
