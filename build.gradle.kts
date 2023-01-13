@@ -40,7 +40,7 @@ dependencies {
     implementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.7")
     implementation("com.auth0", "java-jwt", "4.2.1")
 
-    implementation("io.javalin", "javalin", "5.3.0")
+    implementation("io.javalin", "javalin-bundle", "5.3.0")
 
     implementation("org.slf4j", "slf4j-simple", "2.0.6")
     implementation("org.slf4j", "slf4j-api", "2.0.6")

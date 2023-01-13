@@ -1,5 +1,6 @@
 package de.baaasty.baaastyserver.database.dao;
 
+import com.fasterxml.jackson.annotation.*;
 import de.baaasty.baaastyserver.database.access.Users;
 import de.baaasty.baaastyserver.database.dao.user.Meta;
 import de.chojo.sadu.base.QueryFactory;
@@ -30,6 +31,7 @@ public class User extends QueryFactory {
      *
      * @return The uuid of the user
      */
+    @JsonGetter
     public UUID uuid() {
         return uuid;
     }
@@ -39,6 +41,7 @@ public class User extends QueryFactory {
      *
      * @return The name of the user
      */
+    @JsonGetter
     public String name() {
         return name;
     }
@@ -79,7 +82,8 @@ public class User extends QueryFactory {
      *
      * @return The name of the user
      */
-    public long discordId() {
+    @JsonGetter
+    public Long discordId() {
         return discordId;
     }
 

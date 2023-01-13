@@ -9,8 +9,8 @@ services:
       - "8888:8888"
     env_file:
       - .env
+    volumes:
+      - /home/baaastyde/baaastyserver-data:/baaastyserver
     restart: unless-stopped
     stdin_open: true
     tty: true
-volumes:
-  baaastyserver: { }

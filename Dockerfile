@@ -11,7 +11,7 @@ RUN mkdir -p /baaastyserver
 WORKDIR /baaastyserver
 VOLUME /baaastyserver
 
-COPY --from=build /home/baaastyserver-build/build/libs/BaaastyServer.jar .
+COPY --from=build /home/baaastyserver-build/build/libs/BaaastyServer.jar /baaastyserver
 ENTRYPOINT exec java -jar BaaastyServer.jar \
 			SERVER_TOKEN_ADMIN=$SERVER_TOKEN_ADMIN \
 			ALGORITHM_SECRET=$ALGORITHM_SECRET \
