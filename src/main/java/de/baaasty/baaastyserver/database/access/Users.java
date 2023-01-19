@@ -21,7 +21,7 @@ public class Users extends QueryFactory {
     }
 
     /**
-     * Get the user by the user uuid and cache him
+     * Get the user by the user uuid
      *
      * @param uuid uuid of the user
      * @return user or null if no user is present
@@ -64,7 +64,7 @@ public class Users extends QueryFactory {
     }
 
     /**
-     * Get the user by the user uuid
+     * Get the user by the user uuid and cache him
      *
      * @param uuid uuid of the user
      * @return user or null if no user is present
