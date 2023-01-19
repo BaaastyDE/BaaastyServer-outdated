@@ -26,15 +26,30 @@ public class Users extends QueryFactory {
      * @param uuid uuid of the user
      * @return user or null if no user is present
      */
-    public User cachedByUUID(UUID uuid, boolean cache) {
+    public User byUUID(UUID uuid) {
         System.out.println("Cached users: " + users.size());
 
         if (users.containsKey(uuid)) {
             return users.get(uuid);
         } else {
-            User user = byUUID(uuid);
+            User user = builder(User.class)
+                    .query("""
+                        SELECT
+                        				uuid, name, discord_id
+                        FROM
+                        				user
+                        WHERE
+                        				uuid = ?""")
+                    .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(uuid))
+                    .readRow(row -> new User(
+                            row.getUuidFromBytes("uuid"),
+                            row.getString("name"),
+                            row.getLong("discord_id"),
+                            this
+                    ))
+                    .firstSync()
+                    .orElseGet(() -> new User(uuid, null, null, this));
 
-            if (cache) users.put(uuid, user);
             return user;
         }
     }
@@ -44,8 +59,7 @@ public class Users extends QueryFactory {
      *
      * @param uuid uuid of the user
      */
-    public void removeUserCache(UUID uuid) {
-        users.get(uuid).upload();
+    public void removeUserFromCache(UUID uuid) {
         users.remove(uuid);
     }
 
@@ -55,24 +69,8 @@ public class Users extends QueryFactory {
      * @param uuid uuid of the user
      * @return user or null if no user is present
      */
-    public User byUUID(UUID uuid) {
-        return builder(User.class)
-                .query("""
-                        SELECT
-                        				uuid, name, discord_id
-                        FROM
-                        				user
-                        WHERE
-                        				uuid = ?""")
-                .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(uuid))
-                .readRow(row -> new User(
-                        row.getUuidFromBytes("uuid"),
-                        row.getString("name"),
-                        row.getLong("discord_id"),
-                        this
-                ))
-                .firstSync()
-                .orElseGet(() -> new User(uuid, null, null, this));
+    public void addUserToCache(UUID uuid) {
+        users.put(uuid, byUUID(uuid));
     }
 
     /**

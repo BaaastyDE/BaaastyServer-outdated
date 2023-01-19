@@ -1,7 +1,6 @@
 package de.baaasty.baaastyserver.server;
 
 import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import de.baaasty.baaastyserver.BaaastyServer;
 import de.baaasty.baaastyserver.database.access.Users;
@@ -85,37 +84,39 @@ public class HttpServer {
 
     private void registerUserRequests() {
         javalin
-                .get("/users/user/uuid/{cache}/{uuid}", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache")))))
-                .get("/users/user/uuid/{cache}/{uuid}/uuid", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).uuid().toString()))
-                .get("/users/user/uuid/{cache}/{uuid}/name", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).name()))
-                .put("/users/user/uuid/{cache}/{uuid}/name/{name}", ctx -> {
-                    users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).name(ctx.pathParam("name"));
+                .get("/users/user/uuid/{uuid}", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid")))))
+                .post("/users/user/uuid/{uuid}/cache", ctx -> users.addUserToCache(UUID.fromString(ctx.pathParam("uuid"))))
+                .delete("/users/user/uuid/{uuid}/uncache", ctx -> users.removeUserFromCache(UUID.fromString(ctx.pathParam("uuid"))))
+                .get("/users/user/uuid/{uuid}/uuid", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).uuid().toString()))
+                .get("/users/user/uuid/{uuid}/name", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).name()))
+                .patch("/users/user/uuid/{uuid}/name/{name}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).name(ctx.pathParam("name"));
                     ctx.status(202);
                 })
-                .get("/users/user/uuid/{cache}/{uuid}/discordId", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).discordId()))
-                .put("/users/user/uuid/{cache}/{uuid}/discordId/{discordId}", ctx -> {
-                    ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).discordId(Long.parseLong(ctx.pathParam("discordId"))));
+                .get("/users/user/uuid/{uuid}/discordId", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).discordId()))
+                .patch("/users/user/uuid/{uuid}/discordId/{discordId}", ctx -> {
+                    ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).discordId(Long.parseLong(ctx.pathParam("discordId"))));
                     ctx.status(202);
                 })
-                .get("/users/user/uuid/{cache}/{uuid}/meta", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().cache()))
-                .get("/users/user/uuid/{cache}/{uuid}/meta/language", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().language()))
-                .put("/users/user/uuid/{cache}/{uuid}/meta/language/{language}", ctx -> {
-                    ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().language(ctx.pathParam("language")));
+                .get("/users/user/uuid/{uuid}/meta", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta()))
+                .get("/users/user/uuid/{uuid}/meta/language", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().language()))
+                .patch("/users/user/uuid/{uuid}/meta/language/{language}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().language(ctx.pathParam("language"));
                     ctx.status(202);
                 })
-                .get("/users/user/uuid/{cache}/{uuid}/meta/onlineTime", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().onlineTime()))
-                .put("/users/user/uuid/{cache}/{uuid}/meta/onlineTime/{onlineTime}", ctx -> {
-                    ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().onlineTime(Long.parseLong(ctx.pathParam("onlineTime"))));
+                .get("/users/user/uuid/{uuid}/meta/onlineTime", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().onlineTime()))
+                .patch("/users/user/uuid/{uuid}/meta/onlineTime/{onlineTime}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().onlineTime(Long.parseLong(ctx.pathParam("onlineTime")));
                     ctx.status(202);
                 })
-                .get("/users/user/uuid/{cache}/{uuid}/meta/lastSeen", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().lastSeen()))
-                .put("/users/user/uuid/{cache}/{uuid}/meta/updateLastSeen/", ctx -> {
-                    ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().updateLastSeen());
+                .get("/users/user/uuid/{uuid}/meta/lastSeen", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().lastSeen()))
+                .patch("/users/user/uuid/{uuid}/meta/updateLastSeen/", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().updateLastSeen();
                     ctx.status(202);
                 })
-                .get("/users/user/uuid/{cache}/{uuid}/meta/firstJoin", ctx -> ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().firstJoin()))
-                .put("/users/user/uuid/{cache}/{uuid}/meta/setFirstJoin/", ctx -> {
-                    ctx.json(users.cachedByUUID(UUID.fromString(ctx.pathParam("uuid")), Boolean.parseBoolean(ctx.pathParam("cache"))).meta().setFirstJoin());
+                .get("/users/user/uuid/{uuid}/meta/firstJoin", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().firstJoin()))
+                .patch("/users/user/uuid/{uuid}/meta/setFirstJoin/", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().setFirstJoin();
                     ctx.status(202);
                 });
     }

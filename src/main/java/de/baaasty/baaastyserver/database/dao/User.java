@@ -100,8 +100,8 @@ public class User extends QueryFactory {
      *
      * @return If changed true, if not false
      */
-    public boolean delete() {
-        boolean changed = builder()
+    public void delete() {
+        builder()
                 .query("""
                         DELETE FROM
                             user
@@ -109,12 +109,10 @@ public class User extends QueryFactory {
                             uuid = ?""")
                 .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(uuid))
                 .delete()
-                .sendSync()
-                .changed();
+                .send();
 
-        if (changed) users.removeUserCache(uuid);
-
-        return changed;
+        upload();
+        users.removeUserFromCache(uuid);
     }
 
     /**

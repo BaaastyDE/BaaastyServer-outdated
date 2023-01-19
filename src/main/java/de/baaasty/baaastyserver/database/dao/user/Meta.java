@@ -42,8 +42,8 @@ public class Meta extends QueryFactory {
         return language;
     }
 
-    public boolean language(String language) {
-        boolean changed = builder()
+    public void language(String language) {
+        builder()
                 .query("""
                         INSERT INTO user_meta (
                             user_uuid,
@@ -61,12 +61,9 @@ public class Meta extends QueryFactory {
                         .setString(language)
                 )
                 .update()
-                .sendSync()
-                .changed();
+                .send();
 
-        if (changed) this.language = language;
-
-        return changed;
+        this.language = language;
     }
 
     @JsonGetter
@@ -89,8 +86,8 @@ public class Meta extends QueryFactory {
         return onlineTime;
     }
 
-    public boolean onlineTime(long onlineTime) {
-        boolean changed = builder()
+    public void onlineTime(long onlineTime) {
+        builder()
                 .query("""
                         INSERT INTO user_meta (
                             user_uuid,
@@ -108,12 +105,9 @@ public class Meta extends QueryFactory {
                         .setLong(onlineTime)
                 )
                 .update()
-                .sendSync()
-                .changed();
+                .send();
 
-        if (changed) this.onlineTime = onlineTime;
-
-        return changed;
+        this.onlineTime = onlineTime;
     }
 
     @JsonGetter
@@ -136,10 +130,10 @@ public class Meta extends QueryFactory {
         return lastSeen;
     }
 
-    public boolean updateLastSeen() {
+    public void updateLastSeen() {
         Timestamp now = Timestamp.from(Instant.now());
 
-        boolean changed = builder()
+        builder()
                 .query("""
                         INSERT INTO user_meta (
                             user_uuid,
@@ -157,12 +151,9 @@ public class Meta extends QueryFactory {
                         .setTimestamp(now)
                 )
                 .update()
-                .sendSync()
-                .changed();
+                .send();
 
-        if (changed) this.lastSeen = now;
-
-        return changed;
+        this.lastSeen = now;
     }
 
     @JsonGetter
@@ -185,10 +176,10 @@ public class Meta extends QueryFactory {
         return firstJoin;
     }
 
-    public boolean setFirstJoin() {
+    public void setFirstJoin() {
         Timestamp now = Timestamp.from(Instant.now());
 
-        boolean changed = builder()
+        builder()
                 .query("""
                         INSERT INTO user_meta (
                             user_uuid,
@@ -196,55 +187,18 @@ public class Meta extends QueryFactory {
                         ) VALUES (
                             ?,
                             ?
-                        )""")
+                        )
+                        ON DUPLICATE KEY
+                        UPDATE
+                        create_date = ?""")
                 .parameter(paramBuilder -> paramBuilder
                         .setUuidAsBytes(user.uuid())
                         .setTimestamp(now)
+                        .setTimestamp(now)
                 )
                 .update()
-                .sendSync()
-                .changed();
+                .send();
 
-        if (changed) this.firstJoin = now;
-
-        return changed;
-    }
-
-    public Meta cache() {
-        if (language != null && onlineTime != null && lastSeen != null && firstJoin != null) return this;
-
-        List<String> selectValues = new ArrayList<>();
-
-        if (language == null) selectValues.add("language");
-        if (onlineTime == null) selectValues.add("onlineTime");
-        if (lastSeen == null) selectValues.add("lastSeen");
-        if (firstJoin == null) selectValues.add("firstJoin");
-
-        MetaInfo metaInfo = builder(MetaInfo.class)
-                .query("""
-                        SELECT
-                            ?
-                        FROM
-                            user_meta
-                        WHERE
-                            user_uuid = ?""")
-                .parameter(paramBuilder -> paramBuilder
-                        .setString(String.join(",", selectValues))
-                        .setUuidAsBytes(user.uuid()))
-                .readRow(row -> new MetaInfo(
-                        language != null ? language : row.getString("language"),
-                        onlineTime != null ? onlineTime : row.getLong("online_time"),
-                        lastSeen != null ? lastSeen : row.getTimestamp("last_seen"),
-                        firstJoin != null ? firstJoin : row.getTimestamp("create_date")
-                ))
-                .firstSync()
-                .orElse(new MetaInfo("DE", 0L, Timestamp.from(Instant.now()), Timestamp.from(Instant.now())));
-
-        this.language = metaInfo.language();
-        this.onlineTime = metaInfo.onlineTime();
-        this.lastSeen = metaInfo.lastSeen();
-        this.firstJoin = metaInfo.firstJoin();
-
-        return this;
+        this.firstJoin = now;
     }
 }
