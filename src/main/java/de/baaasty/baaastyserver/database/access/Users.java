@@ -32,7 +32,7 @@ public class Users extends QueryFactory {
         if (users.containsKey(uuid)) {
             return users.get(uuid);
         } else {
-            User user = builder(User.class)
+            return builder(User.class)
                     .query("""
                         SELECT
                         				uuid, name, discord_id
@@ -49,8 +49,6 @@ public class Users extends QueryFactory {
                     ))
                     .firstSync()
                     .orElseGet(() -> new User(uuid, null, null, this));
-
-            return user;
         }
     }
 
