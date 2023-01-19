@@ -26,13 +26,15 @@ public class Users extends QueryFactory {
      * @param uuid uuid of the user
      * @return user or null if no user is present
      */
-    public User cachedByUUID(UUID uuid) {
+    public User cachedByUUID(UUID uuid, boolean cache) {
+        System.out.println("Cached users: " + users.size());
+
         if (users.containsKey(uuid)) {
             return users.get(uuid);
         } else {
             User user = byUUID(uuid);
 
-            users.put(uuid, user);
+            if (cache) users.put(uuid, user);
             return user;
         }
     }

@@ -1,6 +1,6 @@
 package de.baaasty.baaastyserver.database.dao;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import de.baaasty.baaastyserver.database.access.Users;
 import de.baaasty.baaastyserver.database.dao.user.Meta;
 import de.chojo.sadu.base.QueryFactory;
@@ -51,8 +51,8 @@ public class User extends QueryFactory {
      *
      * @param name The new name of the user
      */
-    public boolean name(String name) {
-        boolean changed = builder()
+    public void name(String name) {
+        builder()
                 .query("""
                         INSERT INTO user (
                             uuid,
@@ -69,12 +69,9 @@ public class User extends QueryFactory {
                         .setString(name)
                         .setString(name))
                 .update()
-                .sendSync()
-                .changed();
-        if (changed)
-            this.name = name;
+                .send();
 
-        return changed;
+        this.name = name;
     }
 
     /**
@@ -92,8 +89,10 @@ public class User extends QueryFactory {
      *
      * @param discordId The new discord id of the user
      */
-    public void discordId(long discordId) {
+    public boolean discordId(long discordId) {
         this.discordId = discordId;
+
+        return true;
     }
 
     /**

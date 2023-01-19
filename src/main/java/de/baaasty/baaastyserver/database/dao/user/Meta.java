@@ -1,10 +1,14 @@
 package de.baaasty.baaastyserver.database.dao.user;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import de.baaasty.baaastyserver.database.dao.User;
 import de.chojo.sadu.base.QueryFactory;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Meta extends QueryFactory {
     private final User user;
@@ -18,6 +22,7 @@ public class Meta extends QueryFactory {
         this.user = user;
     }
 
+    @JsonGetter
     public String language() {
         if (language == null) {
             this.language = builder(String.class)
@@ -64,6 +69,7 @@ public class Meta extends QueryFactory {
         return changed;
     }
 
+    @JsonGetter
     public Long onlineTime() {
         if (onlineTime == null) {
             this.onlineTime = builder(Long.class)
@@ -110,6 +116,7 @@ public class Meta extends QueryFactory {
         return changed;
     }
 
+    @JsonGetter
     public Timestamp lastSeen() {
         if (lastSeen == null) {
             this.lastSeen = builder(Timestamp.class)
@@ -158,16 +165,17 @@ public class Meta extends QueryFactory {
         return changed;
     }
 
+    @JsonGetter
     public Timestamp firstJoin() {
         if (firstJoin == null) {
             this.firstJoin = builder(Timestamp.class)
                     .query("""
-                        SELECT
-                            create_date
-                        FROM
-                            user_meta
-                        WHERE
-                            user_uuid = ?""")
+                            SELECT
+                                create_date
+                            FROM
+                                user_meta
+                            WHERE
+                                user_uuid = ?""")
                     .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(user.uuid()))
                     .readRow(row -> row.getTimestamp("create_date"))
                     .firstSync()
@@ -200,5 +208,43 @@ public class Meta extends QueryFactory {
         if (changed) this.firstJoin = now;
 
         return changed;
+    }
+
+    public Meta cache() {
+        if (language != null && onlineTime != null && lastSeen != null && firstJoin != null) return this;
+
+        List<String> selectValues = new ArrayList<>();
+
+        if (language == null) selectValues.add("language");
+        if (onlineTime == null) selectValues.add("onlineTime");
+        if (lastSeen == null) selectValues.add("lastSeen");
+        if (firstJoin == null) selectValues.add("firstJoin");
+
+        MetaInfo metaInfo = builder(MetaInfo.class)
+                .query("""
+                        SELECT
+                            ?
+                        FROM
+                            user_meta
+                        WHERE
+                            user_uuid = ?""")
+                .parameter(paramBuilder -> paramBuilder
+                        .setString(String.join(",", selectValues))
+                        .setUuidAsBytes(user.uuid()))
+                .readRow(row -> new MetaInfo(
+                        language != null ? language : row.getString("language"),
+                        onlineTime != null ? onlineTime : row.getLong("online_time"),
+                        lastSeen != null ? lastSeen : row.getTimestamp("last_seen"),
+                        firstJoin != null ? firstJoin : row.getTimestamp("create_date")
+                ))
+                .firstSync()
+                .orElse(new MetaInfo("DE", 0L, Timestamp.from(Instant.now()), Timestamp.from(Instant.now())));
+
+        this.language = metaInfo.language();
+        this.onlineTime = metaInfo.onlineTime();
+        this.lastSeen = metaInfo.lastSeen();
+        this.firstJoin = metaInfo.firstJoin();
+
+        return this;
     }
 }
