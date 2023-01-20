@@ -27,8 +27,6 @@ public class Users extends QueryFactory {
      * @return user or null if no user is present
      */
     public User byUUID(UUID uuid) {
-        System.out.println("Cached users: " + users.size());
-
         if (users.containsKey(uuid)) {
             return users.get(uuid);
         } else {
@@ -53,7 +51,7 @@ public class Users extends QueryFactory {
     }
 
     /**
-     * Remove the user by the uuid and from cache and upload data
+     * Remove the user by the uuid from the cache
      *
      * @param uuid uuid of the user
      */
@@ -62,10 +60,10 @@ public class Users extends QueryFactory {
     }
 
     /**
-     * Get the user by the user uuid and cache him
+     * sex? ja baby uwu :)
+     * Get the user by the uuid and add him to the cache
      *
      * @param uuid uuid of the user
-     * @return user or null if no user is present
      */
     public void addUserToCache(UUID uuid) {
         users.put(uuid, byUUID(uuid));
