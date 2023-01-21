@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS user_currency
 (
     user_uuid BINARY(16)       NOT NULL,
     amethyst  BIGINT DEFAULT 0 NOT NULL,
+    shard  BIGINT DEFAULT 0 NOT NULL,
 
     CONSTRAINT user_currency_uuid_fk UNIQUE (user_uuid),
     CONSTRAINT user_currency_user_uuid_fk FOREIGN KEY (user_uuid) REFERENCES user (uuid) ON DELETE CASCADE
