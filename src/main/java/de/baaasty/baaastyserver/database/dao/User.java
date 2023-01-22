@@ -2,6 +2,7 @@ package de.baaasty.baaastyserver.database.dao;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import de.baaasty.baaastyserver.database.access.Users;
+import de.baaasty.baaastyserver.database.dao.user.Currencies;
 import de.baaasty.baaastyserver.database.dao.user.Meta;
 import de.chojo.sadu.base.QueryFactory;
 
@@ -16,6 +17,7 @@ public class User extends QueryFactory {
     private String name;
     private Long discordId;
     private final Meta meta;
+    private final Currencies currencies;
 
     public User(UUID uuid, String name, Long discordId, Users users) {
         super(users);
@@ -24,6 +26,7 @@ public class User extends QueryFactory {
         this.name = name;
         this.discordId = discordId;
         this.meta = new Meta(this);
+        this.currencies = new Currencies(this);
     }
 
     /**
@@ -97,8 +100,6 @@ public class User extends QueryFactory {
 
     /**
      * Delete the user from database. If changed, remove it from cache.
-     *
-     * @return If changed true, if not false
      */
     public void delete() {
         builder()
@@ -117,11 +118,9 @@ public class User extends QueryFactory {
 
     /**
      * Upload the user to the database.
-     *
-     * @return If changed true, if not false
      */
-    public boolean upload() {
-        return builder()
+    public void upload() {
+        builder()
                 .query("""
                         INSERT INTO user (
                             uuid,
@@ -143,11 +142,14 @@ public class User extends QueryFactory {
                         .setString(name)
                         .setLong(discordId))
                 .update()
-                .sendSync()
-                .changed();
+                .send();
     }
 
     public Meta meta() {
         return meta;
+    }
+
+    public Currencies currencies() {
+        return currencies;
     }
 }

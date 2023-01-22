@@ -118,10 +118,21 @@ public class HttpServer {
                 .patch("/users/user/uuid/{uuid}/meta/setFirstJoin/", ctx -> {
                     users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).meta().setFirstJoin();
                     ctx.status(202);
+                })
+                .get("/users/user/uuid/{uuid}/currencies", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).currencies()))
+                .get("/users/user/uuid/{uuid}/currencies/amethysts", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).currencies().amethysts()))
+                .patch("/users/user/uuid/{uuid}/currencies/amethysts/{amethysts}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).currencies().amethysts(Long.parseLong(ctx.pathParam("amethysts")));
+                    ctx.status(202);
+                })
+                .get("/users/user/uuid/{uuid}/currencies/shards", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).currencies().shards()))
+                .patch("/users/user/uuid/{uuid}/currencies/shards/{shards}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).currencies().shards(Long.parseLong(ctx.pathParam("shards")));
+                    ctx.status(202);
                 });
     }
 
     public void stop() {
-        this.javalin.stop();
+        javalin.stop();
     }
 }

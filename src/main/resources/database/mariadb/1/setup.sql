@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS user_meta
 CREATE TABLE IF NOT EXISTS user_currency
 (
     user_uuid BINARY(16)       NOT NULL,
-    amethyst  BIGINT DEFAULT 0 NOT NULL,
-    shard  BIGINT DEFAULT 0 NOT NULL,
+    amethysts BIGINT DEFAULT 0 NOT NULL,
+    shards    BIGINT DEFAULT 0 NOT NULL,
 
     CONSTRAINT user_currency_uuid_fk UNIQUE (user_uuid),
     CONSTRAINT user_currency_user_uuid_fk FOREIGN KEY (user_uuid) REFERENCES user (uuid) ON DELETE CASCADE
@@ -135,9 +135,9 @@ CREATE TABLE IF NOT EXISTS clan
 
 CREATE TABLE IF NOT EXISTS clan_meta
 (
-    clan_id INT      NOT NULL,
-    name    TINYTEXT NOT NULL,
-    tag     TINYTEXT NOT NULL,
+    clan_id INT                       NOT NULL,
+    name    TINYTEXT                  NOT NULL,
+    tag     TINYTEXT                  NOT NULL,
     banner  TEXT DEFAULT 'Banner-NBT' NOT NULL,
 
     CONSTRAINT clan_meta_pk UNIQUE (clan_id),

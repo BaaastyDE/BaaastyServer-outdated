@@ -20,13 +20,13 @@ public class Currencies extends QueryFactory {
             this.amethysts = builder(Long.class)
                     .query("""
                             SELECT
-                                amethyst
+                                amethysts
                             FROM
                                 user_currency
                             WHERE
                                 user_uuid = ?""")
                     .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(user.uuid()))
-                    .readRow(row -> row.getLong("amethyst"))
+                    .readRow(row -> row.getLong("amethysts"))
                     .firstSync()
                     .orElse(0L);
         }
@@ -39,14 +39,14 @@ public class Currencies extends QueryFactory {
                 .query("""
                         INSERT INTO user_currency (
                             user_uuid,
-                            amethyst
+                            amethysts
                         ) VALUES (
                             ?,
                             ?
                         )
                         ON DUPLICATE KEY
                         UPDATE
-                        amethyst = ?""")
+                        amethysts = ?""")
                 .parameter(paramBuilder -> paramBuilder
                         .setUuidAsBytes(user.uuid())
                         .setLong(amethysts)
@@ -64,13 +64,13 @@ public class Currencies extends QueryFactory {
             this.shards = builder(Long.class)
                     .query("""
                             SELECT
-                                shard
+                                shards
                             FROM
                                 user_currency
                             WHERE
                                 user_uuid = ?""")
                     .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(user.uuid()))
-                    .readRow(row -> row.getLong("shard"))
+                    .readRow(row -> row.getLong("shards"))
                     .firstSync()
                     .orElse(0L);
         }
@@ -83,14 +83,14 @@ public class Currencies extends QueryFactory {
                 .query("""
                         INSERT INTO user_currency (
                             user_uuid,
-                            shard
+                            shards
                         ) VALUES (
                             ?,
                             ?
                         )
                         ON DUPLICATE KEY
                         UPDATE
-                        shard = ?""")
+                        shards = ?""")
                 .parameter(paramBuilder -> paramBuilder
                         .setUuidAsBytes(user.uuid())
                         .setLong(shards)
