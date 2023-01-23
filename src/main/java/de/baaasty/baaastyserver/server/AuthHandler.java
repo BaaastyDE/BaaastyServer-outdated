@@ -46,6 +46,9 @@ public class AuthHandler {
      * @return The access level
      */
     public int checkToken(String token) {
+        System.out.println("\"" + token + "\"");
+        System.out.println("\"" + adminToken + "\"");
+
         if (token.equals(adminToken)) return 99;
 
         return 0;

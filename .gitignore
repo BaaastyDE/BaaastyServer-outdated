@@ -30,3 +30,7 @@ src/main/java/de/baaasty/baaastyapi/Test.java
 
 # Ignore .env file
 .env
+
+# Ignore configs
+Config.yml
+MariaDB.yml

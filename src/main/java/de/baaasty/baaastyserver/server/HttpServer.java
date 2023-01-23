@@ -65,11 +65,9 @@ public class HttpServer {
                 .post("/auth", ctx -> {
                     String bearer = authHandler.generateBearer(ctx.body());
                     ctx.json(bearer);
-                    ctx.status(401);
-
-                    if (bearer.equals("Not a valid token")) return;
-
                     ctx.status(200);
+
+                    if (bearer.equals("Not a valid token")) ctx.status(401);
                 });
     }
 
