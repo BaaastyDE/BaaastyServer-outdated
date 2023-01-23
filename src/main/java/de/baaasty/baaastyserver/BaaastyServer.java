@@ -3,22 +3,34 @@ package de.baaasty.baaastyserver;
 import de.baaasty.baaastyserver.database.DatabaseConnection;
 import de.baaasty.baaastyserver.database.Updater;
 import de.baaasty.baaastyserver.database.access.Users;
+import de.baaasty.baaastyserver.file.type.ConfigFile;
+import de.baaasty.baaastyserver.file.type.MariaDBFile;
+import de.baaasty.baaastyserver.server.AuthHandler;
 import de.baaasty.baaastyserver.server.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 public class BaaastyServer {
     private static BaaastyServer baaastyServer;
-    private static final Logger logger = LoggerFactory.getLogger(BaaastyServer.class.getName());
+    private final File userDir = new File(System.getProperty("user.dir"));
+    private MariaDBFile mariaDBFile;
+    private ConfigFile configFile;
+    private AuthHandler authHandler;
     private HttpServer server;
     private DatabaseConnection databaseConnection;
     private Users users;
 
     public static void main(String[] args) {
+        Logger logger = LoggerFactory.getLogger(BaaastyServer.class.getName());
+
         logger.info("Starting BaaastyServer...");
 
         baaastyServer = new BaaastyServer();
 
+        baaastyServer.initMariaDBFile();
+        baaastyServer.initConfigFile();
         baaastyServer.initDatabaseConnection();
         baaastyServer.initHttpServer();
 
@@ -30,12 +42,23 @@ public class BaaastyServer {
         }));
     }
 
+    public void initMariaDBFile() {
+        mariaDBFile = new MariaDBFile(userDir);
+        mariaDBFile.setupDefault();
+    }
+
+    public void initConfigFile() {
+        configFile = new ConfigFile(userDir);
+        configFile.setupDefault();
+    }
+
     public void initHttpServer() {
-        server = new HttpServer();
+        authHandler = new AuthHandler(configFile);
+        server = new HttpServer(authHandler);
     }
 
     public void initDatabaseConnection() {
-        databaseConnection = new DatabaseConnection();
+        databaseConnection = new DatabaseConnection(mariaDBFile);
 
         new Updater(databaseConnection);
 

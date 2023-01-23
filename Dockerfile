@@ -7,18 +7,9 @@ RUN gradle clean shadowJar
 
 FROM azul/zulu-openjdk:17-jre-headless
 
-RUN mkdir -p /baaastyserver
+RUN mkdir -p /baaastyserver && mkdir -p /launcher
 WORKDIR /baaastyserver
 VOLUME /baaastyserver
 
-COPY --from=build /home/baaastyserver-build/build/libs/BaaastyServer.jar /baaastyserver
-ENTRYPOINT exec java -jar BaaastyServer.jar \
-			SERVER_TOKEN_ADMIN=$SERVER_TOKEN_ADMIN \
-			ALGORITHM_SECRET=$ALGORITHM_SECRET \
-			MARIADB_HOST=$MARIADB_HOST \
-			MARIADB_PORT=$MARIADB_PORT \
-			MARIADB_DATABASE=$MARIADB_DATABASE \
-			MARIADB_USER=$MARIADB_USER \
-			MARIADB_PASSWORD=$MARIADB_PASSWORD \
-			MARIADB_MAXPOOLSIZE=$MARIADB_MAXPOOLSIZE \
-			MARIADB_MINIDLE=$MARIADB_MINIDLE
+COPY --from=build /home/baaastyserver-build/build/libs/BaaastyServer.jar /launcher
+ENTRYPOINT cp /launcher/BaaastyServer.jar /baaastyserver/BaaastyServer.jar && exec java -jar BaaastyServer.jar

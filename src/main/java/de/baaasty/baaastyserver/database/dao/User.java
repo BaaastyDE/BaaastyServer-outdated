@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import de.baaasty.baaastyserver.database.access.Users;
 import de.baaasty.baaastyserver.database.dao.user.Currencies;
 import de.baaasty.baaastyserver.database.dao.user.Meta;
+import de.baaasty.baaastyserver.database.dao.user.Punishments;
 import de.chojo.sadu.base.QueryFactory;
 
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class User extends QueryFactory {
     private Long discordId;
     private final Meta meta;
     private final Currencies currencies;
+    private final Punishments punishments;
 
     public User(UUID uuid, String name, Long discordId, Users users) {
         super(users);
@@ -27,6 +29,7 @@ public class User extends QueryFactory {
         this.discordId = discordId;
         this.meta = new Meta(this);
         this.currencies = new Currencies(this);
+        this.punishments = new Punishments(this);
     }
 
     /**
@@ -151,5 +154,9 @@ public class User extends QueryFactory {
 
     public Currencies currencies() {
         return currencies;
+    }
+
+    public Punishments punishments() {
+        return punishments;
     }
 }

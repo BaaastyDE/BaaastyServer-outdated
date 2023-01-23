@@ -1,6 +1,7 @@
 package de.baaasty.baaastyserver.database;
 
 import com.zaxxer.hikari.HikariDataSource;
+import de.baaasty.baaastyserver.file.type.MariaDBFile;
 import de.chojo.sadu.databases.MariaDb;
 import de.chojo.sadu.datasource.DataSourceCreator;
 
@@ -10,18 +11,18 @@ import de.chojo.sadu.datasource.DataSourceCreator;
 public class DatabaseConnection {
     private final HikariDataSource dataSource;
 
-    public DatabaseConnection() {
+    public DatabaseConnection(MariaDBFile mariaDBFile) {
         dataSource = DataSourceCreator.create(MariaDb.get())
                 .configure(config -> config
-                        .host(System.getenv("MARIADB_HOST"))
-                        .port(System.getenv("MARIADB_PORT"))
-                        .database(System.getenv("MARIADB_DATABASE"))
-                        .user(System.getenv("MARIADB_USER"))
-                        .password(System.getenv("MARIADB_PASSWORD"))
+                        .host(mariaDBFile.host())
+                        .port(mariaDBFile.port())
+                        .database(mariaDBFile.database())
+                        .user(mariaDBFile.user())
+                        .password(mariaDBFile.password())
                 )
                 .create()
-                .withMaximumPoolSize(Integer.parseInt(System.getenv("MARIADB_MAXPOOLSIZE")))
-                .withMinimumIdle(Integer.parseInt(System.getenv("MARIADB_MINIDLE")))
+                .withMaximumPoolSize(mariaDBFile.maximumPoolSize())
+                .withMinimumIdle(mariaDBFile.minimumIdle())
                 .build();
     }
 

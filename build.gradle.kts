@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo.sadu", "sadu", "1.2.0")
+    implementation("de.chojo.sadu", "sadu", "1.2.0-DEV")
     implementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.7")
     implementation("com.auth0", "java-jwt", "4.2.1")
 
@@ -44,4 +44,6 @@ dependencies {
 
     implementation("org.slf4j", "slf4j-simple", "2.0.6")
     implementation("org.slf4j", "slf4j-api", "2.0.6")
+
+    implementation("org.yaml:snakeyaml:1.33")
 }

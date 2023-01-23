@@ -3,11 +3,19 @@ package de.baaasty.baaastyserver.server;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import de.baaasty.baaastyserver.BaaastyServer;
+import de.baaasty.baaastyserver.file.type.ConfigFile;
 
 import java.time.Instant;
 
 public class AuthHandler {
-    private static final Algorithm algorithm = Algorithm.HMAC256(System.getenv("ALGORITHM_SECRET"));
+    private final Algorithm algorithm;
+    private final String adminToken;
+
+    public AuthHandler(ConfigFile configFile) {
+        algorithm = Algorithm.HMAC256(configFile.algorithmSecret());
+        adminToken = configFile.adminToken();
+    }
 
     public String generateBearer(String token) {
         int accessLevel = checkToken(token);
@@ -38,7 +46,7 @@ public class AuthHandler {
      * @return The access level
      */
     public int checkToken(String token) {
-        if (System.getenv("SERVER_TOKEN_ADMIN").equals(token)) return 99;
+        if (token.equals(adminToken)) return 99;
 
         return 0;
     }

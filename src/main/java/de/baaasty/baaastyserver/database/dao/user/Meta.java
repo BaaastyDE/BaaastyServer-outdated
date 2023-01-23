@@ -128,8 +128,6 @@ public class Meta extends QueryFactory {
     }
 
     public void updateLastSeen() {
-        Timestamp now = Timestamp.from(Instant.now());
-
         builder()
                 .query("""
                         INSERT INTO user_meta (
@@ -137,20 +135,16 @@ public class Meta extends QueryFactory {
                             last_seen
                         ) VALUES (
                             ?,
-                            ?
+                            CURRENT_TIMESTAMP
                         )
                         ON DUPLICATE KEY
                         UPDATE
-                        last_seen = ?""")
-                .parameter(paramBuilder -> paramBuilder
-                        .setUuidAsBytes(user.uuid())
-                        .setTimestamp(now)
-                        .setTimestamp(now)
-                )
+                        last_seen = CURRENT_TIMESTAMP""")
+                .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(user.uuid()))
                 .update()
                 .send();
 
-        this.lastSeen = now;
+        this.lastSeen = Timestamp.from(Instant.now());
     }
 
     @JsonGetter
@@ -174,8 +168,6 @@ public class Meta extends QueryFactory {
     }
 
     public void setFirstJoin() {
-        Timestamp now = Timestamp.from(Instant.now());
-
         builder()
                 .query("""
                         INSERT INTO user_meta (
@@ -183,19 +175,15 @@ public class Meta extends QueryFactory {
                             create_date
                         ) VALUES (
                             ?,
-                            ?
+                            CURRENT_TIMESTAMP
                         )
                         ON DUPLICATE KEY
                         UPDATE
-                        create_date = ?""")
-                .parameter(paramBuilder -> paramBuilder
-                        .setUuidAsBytes(user.uuid())
-                        .setTimestamp(now)
-                        .setTimestamp(now)
-                )
+                        create_date = CURRENT_TIMESTAMP""")
+                .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(user.uuid()))
                 .update()
                 .send();
 
-        this.firstJoin = now;
+        this.firstJoin = Timestamp.from(Instant.now());
     }
 }

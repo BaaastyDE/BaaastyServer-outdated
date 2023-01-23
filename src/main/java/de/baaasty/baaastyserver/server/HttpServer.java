@@ -4,21 +4,30 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import de.baaasty.baaastyserver.BaaastyServer;
 import de.baaasty.baaastyserver.database.access.Users;
+import de.baaasty.baaastyserver.database.dao.User;
+import de.baaasty.baaastyserver.database.dao.user.punishments.info.*;
 import de.baaasty.baaastyserver.server.exception.InvalidAuthException;
 import de.baaasty.baaastyserver.server.exception.MissingAuthException;
 import io.javalin.Javalin;
 import io.javalin.json.JavalinJackson;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class HttpServer {
     private final Javalin javalin;
-    private final AuthHandler authHandler = new AuthHandler();
+    private final AuthHandler authHandler;
     private final Users users = BaaastyServer.instance().users();
 
-    public HttpServer() {
-        users.byUUID(UUID.fromString("7ccf6e1c-68fc-442d-88d0-341b315a29cd")).name("Baaasty");
+    public HttpServer(AuthHandler authHandler) {
+        this.authHandler = authHandler;
+
+        users.byUUID(UUID.fromString("9bbf53d5-b2a2-4d3f-b1a0-8e2d65fd2d94")).name("amonhtm");
+        User user = users.byUUID(UUID.fromString("7ccf6e1c-68fc-442d-88d0-341b315a29cd"));
+
+        user.name("Baaasty");
+        user.punishments().bans().add(UUID.fromString("9bbf53d5-b2a2-4d3f-b1a0-8e2d65fd2d94"), (byte) 1, 60);
 
         JsonMapper.builder().disable(
                 MapperFeature.AUTO_DETECT_CREATORS,
@@ -53,8 +62,13 @@ public class HttpServer {
                     ctx.json("Pong!");
                     ctx.status(418);
                 })
-                .get("/auth", ctx -> {
-                    ctx.json(authHandler.generateBearer(ctx.body()));
+                .post("/auth", ctx -> {
+                    String bearer = authHandler.generateBearer(ctx.body());
+                    ctx.json(bearer);
+                    ctx.status(401);
+
+                    if (bearer.equals("Not a valid token")) return;
+
                     ctx.status(200);
                 });
     }
@@ -128,6 +142,69 @@ public class HttpServer {
                 .get("/users/user/uuid/{uuid}/currencies/shards", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).currencies().shards()))
                 .patch("/users/user/uuid/{uuid}/currencies/shards/{shards}", ctx -> {
                     users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).currencies().shards(Long.parseLong(ctx.pathParam("shards")));
+                    ctx.status(202);
+                })
+                .get("/users/user/uuid/{uuid}/punishments", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments()))
+                .get("/users/user/uuid/{uuid}/punishments/bans", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().bans().all()))
+                .get("/users/user/uuid/{uuid}/punishments/bans/latest", ctx -> {
+                    Optional<Ban> optBan = users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().bans().latest();
+                    ctx.json(optBan.isPresent() ? optBan.get() : "");
+                })
+                .post("/users/user/uuid/{uuid}/punishments/bans/{executedUuid}/{reasonId}/{duration}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().bans().add(
+                            UUID.fromString(ctx.pathParam("executedUuid")),
+                            Byte.parseByte(ctx.pathParam("reasonId")),
+                            Long.parseLong(ctx.pathParam("duration"))
+                    );
+                    ctx.status(202);
+                })
+                .get("/users/user/uuid/{uuid}/punishments/kicks", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().kicks().all()))
+                .get("/users/user/uuid/{uuid}/punishments/kicks/latest", ctx -> {
+                    Optional<Kick> optKick = users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().kicks().latest();
+                    ctx.json(optKick.isPresent() ? optKick.get() : "");
+                })
+                .post("/users/user/uuid/{uuid}/punishments/kicks/{executedUuid}/{reasonId}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().kicks().add(
+                            UUID.fromString(ctx.pathParam("executedUuid")),
+                            Byte.parseByte(ctx.pathParam("reasonId"))
+                    );
+                    ctx.status(202);
+                })
+                .get("/users/user/uuid/{uuid}/punishments/mutes", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().mutes().all()))
+                .get("/users/user/uuid/{uuid}/punishments/mutes/latest", ctx -> {
+                    Optional<Mute> optMute = users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().mutes().latest();
+                    ctx.json(optMute.isPresent() ? optMute.get() : "");
+                })
+                .post("/users/user/uuid/{uuid}/punishments/mutes/{executedUuid}/{reasonId}/{duration}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().mutes().add(
+                            UUID.fromString(ctx.pathParam("executedUuid")),
+                            Byte.parseByte(ctx.pathParam("reasonId")),
+                            Long.parseLong(ctx.pathParam("duration"))
+                    );
+                    ctx.status(202);
+                })
+                .get("/users/user/uuid/{uuid}/punishments/reports", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().reports().all()))
+                .get("/users/user/uuid/{uuid}/punishments/reports/latest", ctx -> {
+                    Optional<Report> optReport = users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().reports().latest();
+                    ctx.json(optReport.isPresent() ? optReport.get() : "");
+                })
+                .post("/users/user/uuid/{uuid}/punishments/reports/{executedUuid}/{reasonId}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().reports().add(
+                            UUID.fromString(ctx.pathParam("executedUuid")),
+                            Byte.parseByte(ctx.pathParam("reasonId"))
+                    );
+                    ctx.status(202);
+                })
+                .get("/users/user/uuid/{uuid}/punishments/warns", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().warns().all()))
+                .get("/users/user/uuid/{uuid}/punishments/warns/latest", ctx -> {
+                    Optional<Warn> optWarn = users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().warns().latest();
+                    ctx.json(optWarn.isPresent() ? optWarn.get() : "");
+                })
+                .post("/users/user/uuid/{uuid}/punishments/warns/{executedUuid}/{reasonId}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid"))).punishments().warns().add(
+                            UUID.fromString(ctx.pathParam("executedUuid")),
+                            Byte.parseByte(ctx.pathParam("reasonId"))
+                    );
                     ctx.status(202);
                 });
     }
