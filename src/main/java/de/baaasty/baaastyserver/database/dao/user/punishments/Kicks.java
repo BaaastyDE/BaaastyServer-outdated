@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public class Kicks extends QueryFactory {
     private final User user;
+    private List<Kick> kicks = null;
+    private Kick latest = null;
 
     public Kicks(User user) {
         super(user);
@@ -19,71 +21,78 @@ public class Kicks extends QueryFactory {
 
     @JsonGetter
     public List<Kick> all() {
-        return builder(Kick.class)
-                .query("""
-                        SELECT
-                            id,
-                            user_uuid,
-                            executed_uuid,
-                            canceled_uuid,
-                            reason_id,
-                            canceled_date,
-                            create_date
-                        FROM
-                            kick
-                        WHERE
-                            user_uuid = ?""")
-                .parameter(paramBuilder -> paramBuilder
-                        .setUuidAsBytes(user.uuid())
-                )
-                .readRow(row -> new Kick(
-                        row.getInt("id"),
-                        row.getUuidFromBytes("user_uuid"),
-                        row.getUuidFromBytes("executed_uuid"),
-                        row.getUuidFromBytes("canceled_uuid"),
-                        row.getByte("reason_id"),
-                        row.getTimestamp("canceled_date"),
-                        row.getTimestamp("create_date")
-                ))
-                .allSync();
+        if (kicks == null)
+            this.kicks = builder(Kick.class)
+                    .query("""
+                            SELECT
+                                id,
+                                user_uuid,
+                                executed_uuid,
+                                canceled_uuid,
+                                reason_id,
+                                canceled_date,
+                                create_date
+                            FROM
+                                kick
+                            WHERE
+                                user_uuid = ?""")
+                    .parameter(paramBuilder -> paramBuilder
+                            .setUuidAsBytes(user.uuid())
+                    )
+                    .readRow(row -> new Kick(
+                            row.getInt("id"),
+                            row.getUuidFromBytes("user_uuid"),
+                            row.getUuidFromBytes("executed_uuid"),
+                            row.getUuidFromBytes("canceled_uuid"),
+                            row.getByte("reason_id"),
+                            row.getTimestamp("canceled_date"),
+                            row.getTimestamp("create_date")
+                    ))
+                    .allSync();
+
+        return kicks;
     }
 
     public Optional<Kick> latest() {
-        return builder(Kick.class)
-                .query("""
-                        SELECT
-                            id,
-                            user_uuid,
-                            executed_uuid,
-                            canceled_uuid,
-                            reason_id,
-                            canceled_date,
-                            create_date
-                        FROM
-                            kick
-                        WHERE
-                            user_uuid = ?
-                          AND
-                            canceled_uuid IS NULL
-                        ORDER BY until_date DESC
-                        LIMIT 1""")
-                .parameter(paramBuilder -> paramBuilder
-                        .setUuidAsBytes(user.uuid())
-                )
-                .readRow(row -> new Kick(
-                        row.getInt("id"),
-                        row.getUuidFromBytes("user_uuid"),
-                        row.getUuidFromBytes("executed_uuid"),
-                        row.getUuidFromBytes("canceled_uuid"),
-                        row.getByte("reason_id"),
-                        row.getTimestamp("canceled_date"),
-                        row.getTimestamp("create_date")
-                ))
-                .firstSync();
+        if (latest == null)
+            builder(Kick.class)
+                    .query("""
+                            SELECT
+                                id,
+                                user_uuid,
+                                executed_uuid,
+                                canceled_uuid,
+                                reason_id,
+                                canceled_date,
+                                create_date
+                            FROM
+                                kick
+                            WHERE
+                                user_uuid = ?
+                              AND
+                                canceled_uuid IS NULL
+                            ORDER BY until_date DESC
+                            LIMIT 1""")
+                    .parameter(paramBuilder -> paramBuilder
+                            .setUuidAsBytes(user.uuid())
+                    )
+                    .readRow(row -> new Kick(
+                            row.getInt("id"),
+                            row.getUuidFromBytes("user_uuid"),
+                            row.getUuidFromBytes("executed_uuid"),
+                            row.getUuidFromBytes("canceled_uuid"),
+                            row.getByte("reason_id"),
+                            row.getTimestamp("canceled_date"),
+                            row.getTimestamp("create_date")
+                    ))
+                    .firstSync()
+                    .ifPresent(kick -> this.latest = kick);
+
+        return Optional.ofNullable(latest);
     }
 
-    public boolean add(UUID uuid, byte reasonID) {
-        return builder()
+    public void add(UUID uuid, byte reasonID) {
+        builder()
                 .query("""
                         INSERT INTO kick (
                             user_uuid,
@@ -100,7 +109,8 @@ public class Kicks extends QueryFactory {
                         .setByte(reasonID)
                 )
                 .insert()
-                .sendSync()
-                .changed();
+                .send();
+
+        this.latest = null;
     }
 }

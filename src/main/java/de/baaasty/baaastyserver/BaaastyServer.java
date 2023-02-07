@@ -2,6 +2,7 @@ package de.baaasty.baaastyserver;
 
 import de.baaasty.baaastyserver.database.DatabaseConnection;
 import de.baaasty.baaastyserver.database.Updater;
+import de.baaasty.baaastyserver.database.access.Transactions;
 import de.baaasty.baaastyserver.database.access.Users;
 import de.baaasty.baaastyserver.file.type.ConfigFile;
 import de.baaasty.baaastyserver.file.type.MariaDBFile;
@@ -21,6 +22,7 @@ public class BaaastyServer {
     private HttpServer server;
     private DatabaseConnection databaseConnection;
     private Users users;
+    private Transactions transactions;
 
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(BaaastyServer.class.getName());
@@ -63,10 +65,15 @@ public class BaaastyServer {
         new Updater(databaseConnection);
 
         users = new Users(databaseConnection);
+        transactions = new Transactions(databaseConnection);
     }
 
     public Users users() {
         return users;
+    }
+
+    public Transactions transactions() {
+        return transactions;
     }
 
     public static BaaastyServer instance() {

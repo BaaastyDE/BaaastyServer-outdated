@@ -14,5 +14,6 @@ public record Ban(
         @JsonGetter byte reasonID,
         @JsonGetter Timestamp untilDate,
         @JsonGetter @Nullable Timestamp canceledDate,
-        @JsonGetter Timestamp createDate) {
+        @JsonGetter Timestamp createDate
+) {
 }

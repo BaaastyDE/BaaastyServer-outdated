@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public class Bans extends QueryFactory {
     private final User user;
+    private List<Ban> bans = null;
+    private Ban latest = null;
 
     public Bans(User user) {
         super(user);
@@ -19,75 +21,82 @@ public class Bans extends QueryFactory {
 
     @JsonGetter
     public List<Ban> all() {
-        return builder(Ban.class)
-                .query("""
-                        SELECT
-                            id,
-                            user_uuid,
-                            executed_uuid,
-                            canceled_uuid,
-                            reason_id,
-                            until_date,
-                            canceled_date,
-                            create_date
-                        FROM
-                            ban
-                        WHERE
-                            user_uuid = ?""")
-                .parameter(paramBuilder -> paramBuilder
-                        .setUuidAsBytes(user.uuid())
-                )
-                .readRow(row -> new Ban(
-                        row.getInt("id"),
-                        row.getUuidFromBytes("user_uuid"),
-                        row.getUuidFromBytes("executed_uuid"),
-                        row.getUuidFromBytes("canceled_uuid"),
-                        row.getByte("reason_id"),
-                        row.getTimestamp("until_date"),
-                        row.getTimestamp("canceled_date"),
-                        row.getTimestamp("create_date")
-                ))
-                .allSync();
+        if (bans == null)
+            this.bans = builder(Ban.class)
+                    .query("""
+                            SELECT
+                                id,
+                                user_uuid,
+                                executed_uuid,
+                                canceled_uuid,
+                                reason_id,
+                                until_date,
+                                canceled_date,
+                                create_date
+                            FROM
+                                ban
+                            WHERE
+                                user_uuid = ?""")
+                    .parameter(paramBuilder -> paramBuilder
+                            .setUuidAsBytes(user.uuid())
+                    )
+                    .readRow(row -> new Ban(
+                            row.getInt("id"),
+                            row.getUuidFromBytes("user_uuid"),
+                            row.getUuidFromBytes("executed_uuid"),
+                            row.getUuidFromBytes("canceled_uuid"),
+                            row.getByte("reason_id"),
+                            row.getTimestamp("until_date"),
+                            row.getTimestamp("canceled_date"),
+                            row.getTimestamp("create_date")
+                    ))
+                    .allSync();
+
+        return bans;
     }
 
     public Optional<Ban> latest() {
-        return builder(Ban.class)
-                .query("""
-                        SELECT
-                            id,
-                            user_uuid,
-                            executed_uuid,
-                            canceled_uuid,
-                            reason_id,
-                            until_date,
-                            canceled_date,
-                            create_date
-                        FROM
-                            ban
-                        WHERE
-                            user_uuid = ?
-                          AND
-                            canceled_uuid IS NULL
-                        ORDER BY until_date DESC
-                        LIMIT 1""")
-                .parameter(paramBuilder -> paramBuilder
-                        .setUuidAsBytes(user.uuid())
-                )
-                .readRow(row -> new Ban(
-                        row.getInt("id"),
-                        row.getUuidFromBytes("user_uuid"),
-                        row.getUuidFromBytes("executed_uuid"),
-                        row.getUuidFromBytes("canceled_uuid"),
-                        row.getByte("reason_id"),
-                        row.getTimestamp("until_date"),
-                        row.getTimestamp("canceled_date"),
-                        row.getTimestamp("create_date")
-                ))
-                .firstSync();
+        if (latest == null)
+            builder(Ban.class)
+                    .query("""
+                            SELECT
+                                id,
+                                user_uuid,
+                                executed_uuid,
+                                canceled_uuid,
+                                reason_id,
+                                until_date,
+                                canceled_date,
+                                create_date
+                            FROM
+                                ban
+                            WHERE
+                                user_uuid = ?
+                              AND
+                                canceled_uuid IS NULL
+                            ORDER BY until_date DESC
+                            LIMIT 1""")
+                    .parameter(paramBuilder -> paramBuilder
+                            .setUuidAsBytes(user.uuid())
+                    )
+                    .readRow(row -> new Ban(
+                            row.getInt("id"),
+                            row.getUuidFromBytes("user_uuid"),
+                            row.getUuidFromBytes("executed_uuid"),
+                            row.getUuidFromBytes("canceled_uuid"),
+                            row.getByte("reason_id"),
+                            row.getTimestamp("until_date"),
+                            row.getTimestamp("canceled_date"),
+                            row.getTimestamp("create_date")
+                    ))
+                    .firstSync()
+                    .ifPresent(ban -> this.latest = ban);
+
+        return Optional.ofNullable(latest);
     }
 
-    public boolean add(UUID uuid, byte reasonID, long duration) {
-        return builder()
+    public void add(UUID uuid, byte reasonID, long duration) {
+        builder()
                 .query("""
                         INSERT INTO ban (
                             user_uuid,
@@ -105,9 +114,10 @@ public class Bans extends QueryFactory {
                         .setUuidAsBytes(uuid)
                         .setByte(reasonID)
                         .setLong(duration)
-                    )
+                )
                 .insert()
-                .sendSync()
-                .changed();
+                .send();
+
+        this.latest = null;
     }
 }

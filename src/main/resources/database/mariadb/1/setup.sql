@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS user
 CREATE TABLE IF NOT EXISTS user_meta
 (
     user_uuid   BINARY(16)                           NOT NULL,
-    language    TINYTEXT DEFAULT 'DE'                NOT NULL,
+    language    TINYINT  DEFAULT 1                   NOT NULL,
     online_time BIGINT   DEFAULT 0                   NOT NULL,
     last_seen   DATETIME DEFAULT current_timestamp() NOT NULL,
     create_date DATETIME DEFAULT current_timestamp() NOT NULL,
@@ -27,6 +27,20 @@ CREATE TABLE IF NOT EXISTS user_currency
 
     CONSTRAINT user_currency_uuid_fk UNIQUE (user_uuid),
     CONSTRAINT user_currency_user_uuid_fk FOREIGN KEY (user_uuid) REFERENCES user (uuid) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS currency_transactions
+(
+    id          BIGINT AUTO_INCREMENT                NOT NULL,
+    user_uuid   BINARY(16)                           NULL,
+    target_uuid BINARY(16)                           NULL,
+    amethysts   BIGINT   DEFAULT 0                   NOT NULL,
+    shards      BIGINT   DEFAULT 0                   NOT NULL,
+    create_date DATETIME DEFAULT current_timestamp() NOT NULL,
+
+    CONSTRAINT currency_transactions_id_pk PRIMARY KEY (id),
+    CONSTRAINT currency_transactions_user_uuid_fk FOREIGN KEY (user_uuid) REFERENCES user (uuid) ON DELETE CASCADE,
+    CONSTRAINT currency_transactions_target_uuid_fk FOREIGN KEY (target_uuid) REFERENCES user (uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_setting

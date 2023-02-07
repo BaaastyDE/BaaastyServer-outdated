@@ -5,6 +5,7 @@ import de.baaasty.baaastyserver.database.access.Users;
 import de.baaasty.baaastyserver.database.dao.user.Currencies;
 import de.baaasty.baaastyserver.database.dao.user.Meta;
 import de.baaasty.baaastyserver.database.dao.user.Punishments;
+import de.baaasty.baaastyserver.database.access.Transactions;
 import de.chojo.sadu.base.QueryFactory;
 
 import java.util.UUID;
