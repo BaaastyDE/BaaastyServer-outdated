@@ -1,20 +1,17 @@
 package de.baaasty.baaastyserver.database.dao.user;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import de.baaasty.baaastyserver.database.access.Transactions;
 import de.baaasty.baaastyserver.database.dao.User;
 import de.baaasty.baaastyserver.database.dao.user.currencies.Amethysts;
 import de.baaasty.baaastyserver.database.dao.user.currencies.Shards;
 import de.chojo.sadu.base.QueryFactory;
 
 public class Currencies extends QueryFactory {
-    private final User user;
     private final Amethysts amethysts;
     private final Shards shards;
 
     public Currencies(User user) {
         super(user);
-        this.user = user;
         this.amethysts = new Amethysts(user);
         this.shards = new Shards(user);
     }

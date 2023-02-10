@@ -32,12 +32,12 @@ public class Users extends QueryFactory {
         } else {
             return builder(User.class)
                     .query("""
-                        SELECT
-                        				uuid, name, discord_id
-                        FROM
-                        				user
-                        WHERE
-                        				uuid = ?""")
+                            SELECT
+                            	uuid, name, discord_id
+                            FROM
+                            	user
+                            WHERE
+                            	uuid = ?""")
                     .parameter(paramBuilder -> paramBuilder.setUuidAsBytes(uuid))
                     .readRow(row -> new User(
                             row.getUuidFromBytes("uuid"),
@@ -79,11 +79,11 @@ public class Users extends QueryFactory {
         return builder(User.class)
                 .query("""
                         SELECT
-                        				uuid, name, discord_id
+                        	uuid, name, discord_id
                         FROM
-                        				user
+                        	user
                         WHERE
-                        				name = ?""")
+                        	name = ?""")
                 .parameter(paramBuilder -> paramBuilder.setString(name))
                 .readRow(row -> new User(
                         row.getUuidFromBytes("uuid"),

@@ -12,19 +12,19 @@ public class Transactions extends QueryFactory {
         super(databaseConnection.dataSource());
     }
 
-    public Transaction byID (long id) {
+    public Transaction byID(long id) {
         return builder(Transaction.class)
                 .query("""
-                            SELECT
-                                id,
-                                user_uuid,
-                                target_uuid,
-                                amethysts,
-                                shards
-                            FROM
-                                currency_transactions
-                            WHERE
-                                id = ?""")
+                        SELECT
+                            id,
+                            user_uuid,
+                            target_uuid,
+                            amethysts,
+                            shards
+                        FROM
+                            currency_transactions
+                        WHERE
+                            id = ?""")
                 .parameter(paramBuilder -> paramBuilder
                         .setLong(id)
                 )
@@ -36,7 +36,7 @@ public class Transactions extends QueryFactory {
                         row.getLong("shards")
                 ))
                 .firstSync()
-                .orElse(new Transaction(id, null, null, 0, 0));
+                .orElse(new Transaction(0, null, null, 0, 0));
     }
 
     public void amethysts(@Nullable UUID uuid, @Nullable UUID targetUuid, long amethysts) {
@@ -63,15 +63,15 @@ public class Transactions extends QueryFactory {
     public long amethysts(UUID uuid, int hours) {
         long send = builder(Long.class)
                 .query("""
-                            SELECT
-                                SUM(amethysts) AS sumAmethysts
-                            FROM
-                                currency_transactions
-                            WHERE
-                                user_uuid = ?
-                              AND
-                                create_date > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? HOUR)
-                            GROUP BY user_uuid""")
+                        SELECT
+                            SUM(amethysts) AS sumAmethysts
+                        FROM
+                            currency_transactions
+                        WHERE
+                            user_uuid = ?
+                          AND
+                            create_date > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? HOUR)
+                        GROUP BY user_uuid""")
                 .parameter(paramBuilder -> paramBuilder
                         .setUuidAsBytes(uuid)
                         .setInt(hours)
@@ -126,15 +126,15 @@ public class Transactions extends QueryFactory {
     public long shards(UUID uuid, int hours) {
         long send = builder(Long.class)
                 .query("""
-                            SELECT
-                                SUM(shards) AS sumShards
-                            FROM
-                                currency_transactions
-                            WHERE
-                                user_uuid = ?
-                              AND
-                                create_date > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? HOUR)
-                            GROUP BY user_uuid""")
+                        SELECT
+                            SUM(shards) AS sumShards
+                        FROM
+                            currency_transactions
+                        WHERE
+                            user_uuid = ?
+                          AND
+                            create_date > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? HOUR)
+                        GROUP BY user_uuid""")
                 .parameter(paramBuilder -> paramBuilder
                         .setUuidAsBytes(uuid)
                         .setInt(hours)
@@ -145,15 +145,15 @@ public class Transactions extends QueryFactory {
 
         long received = builder(Long.class)
                 .query("""
-                            SELECT
-                                SUM(shards) AS sumShards
-                            FROM
-                                currency_transactions
-                            WHERE
-                                target_uuid = ?
-                              AND
-                                create_date > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? HOUR)
-                            GROUP BY target_uuid""")
+                        SELECT
+                            SUM(shards) AS sumShards
+                        FROM
+                            currency_transactions
+                        WHERE
+                            target_uuid = ?
+                          AND
+                            create_date > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? HOUR)
+                        GROUP BY target_uuid""")
                 .parameter(paramBuilder -> paramBuilder
                         .setUuidAsBytes(uuid)
                         .setInt(hours)
