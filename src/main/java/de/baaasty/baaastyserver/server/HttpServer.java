@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import de.baaasty.baaastyserver.BaaastyServer;
 import de.baaasty.baaastyserver.database.access.Transactions;
 import de.baaasty.baaastyserver.database.access.Users;
+import de.baaasty.baaastyserver.database.dao.User;
 import de.baaasty.baaastyserver.database.dao.user.punishments.info.*;
 import de.baaasty.baaastyserver.server.exception.InvalidAuthException;
 import de.baaasty.baaastyserver.server.exception.MissingAuthException;
@@ -94,6 +95,16 @@ public class HttpServer {
 
     private void registerUserRequests() {
         javalin
+                /* IDEE
+
+                .path("/users/user/name/{name}", ctx -> {
+                    users.byName(ctx.pathParam("name"));
+                })
+                .path("/users/user/uuid/{uuid}", ctx -> {
+                    users.byUUID(UUID.fromString(ctx.pathParam("uuid")));
+                })
+                */
+
                 .get("/users/user/uuid/{uuid}", ctx -> ctx.json(users.byUUID(UUID.fromString(ctx.pathParam("uuid")))))
                 .post("/users/user/uuid/{uuid}/cache", ctx -> users.addUserToCache(UUID.fromString(ctx.pathParam("uuid"))))
                 .delete("/users/user/uuid/{uuid}/uncache", ctx -> users.removeUserFromCache(UUID.fromString(ctx.pathParam("uuid"))))

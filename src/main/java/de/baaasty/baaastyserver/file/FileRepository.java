@@ -48,11 +48,11 @@ public class FileRepository {
         }
     }
 
-    public LinkedHashMap<String, Object> getData() {
+    public LinkedHashMap<String, Object> data() {
         return data;
     }
 
-    public void setData(LinkedHashMap<String, Object> data) {
+    public void data(LinkedHashMap<String, Object> data) {
         this.data = data;
     }
 

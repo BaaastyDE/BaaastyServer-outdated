@@ -13,20 +13,20 @@ public class ConfigFile extends FileRepository {
     public void setupDefault() {
         initFile();
 
-        LinkedHashMap<String, Object> configData = getData();
+        LinkedHashMap<String, Object> configData = data();
 
         configData.putIfAbsent("algorithmSecret", "S3CR3T");
         configData.putIfAbsent("adminToken", "T0K3N");
 
-        setData(configData);
+        data(configData);
         dump();
     }
 
     public String algorithmSecret() {
-        return (String) getData().get("algorithmSecret");
+        return (String) data().get("algorithmSecret");
     }
 
     public String adminToken() {
-        return (String) getData().get("adminToken");
+        return (String) data().get("adminToken");
     }
 }
