@@ -7,9 +7,9 @@ RUN gradle clean shadowJar
 
 FROM azul/zulu-openjdk:17-jre-headless
 
-RUN mkdir -p /baaastyserver && mkdir -p /launcher
+RUN mkdir -p /baaastyserver
 WORKDIR /baaastyserver
 VOLUME /baaastyserver
 
-COPY --from=build /home/baaastyserver-build/build/libs/BaaastyServer.jar /launcher
-ENTRYPOINT cp /launcher/BaaastyServer.jar /baaastyserver/BaaastyServer.jar && exec java -jar BaaastyServer.jar
+COPY --from=build /home/baaastyserver-build/build/libs/BaaastyServer.jar /baaastyserver
+ENTRYPOINT exec java -jar BaaastyServer.jar

@@ -36,7 +36,7 @@ public class Transactions extends QueryFactory {
                         row.getLong("shards")
                 ))
                 .firstSync()
-                .orElse(new Transaction(id, null, null, 0, 0));
+                .orElse(new Transaction(0, null, null, 0, 0));
     }
 
     public void amethysts(@Nullable UUID uuid, @Nullable UUID targetUuid, long amethysts) {

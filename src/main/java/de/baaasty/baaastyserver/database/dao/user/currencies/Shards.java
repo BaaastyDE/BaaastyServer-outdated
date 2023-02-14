@@ -8,7 +8,7 @@ import de.chojo.sadu.base.QueryFactory;
 
 import java.util.UUID;
 
-public class Shards extends QueryFactory {
+ public class Shards extends QueryFactory {
     private final User user;
     private final Transactions transactions = BaaastyServer.instance().transactions();
     private Long shards = null;
