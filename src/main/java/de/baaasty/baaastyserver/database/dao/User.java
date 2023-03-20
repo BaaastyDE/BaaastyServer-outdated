@@ -116,7 +116,6 @@ public class User extends QueryFactory {
                 .delete()
                 .send();
 
-        upload();
         users.removeUserFromCache(uuid);
     }
 

@@ -2,6 +2,9 @@ plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("maven-publish")
+
+    id("org.springframework.boot") version "3.0.3"
+    id("io.spring.dependency-management") version "1.1.0"
 }
 
 group = "de.baaasty"
@@ -19,6 +22,9 @@ tasks {
             attributes["Main-Class"] = "de.baaasty.baaastyserver.BaaastyServer"
         }
     }
+    withType<Test> {
+        useJUnitPlatform()
+    }
 }
 
 
@@ -33,6 +39,8 @@ java {
 repositories {
     mavenCentral()
     maven("https://eldonexus.de/repository/maven-public")
+    maven("https://repo.spring.io/snapshot")
+    maven("https://repo.spring.io/milestone")
 }
 
 dependencies {
@@ -40,10 +48,9 @@ dependencies {
     implementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.7")
     implementation("com.auth0", "java-jwt", "4.2.1")
 
-    implementation("io.javalin", "javalin-bundle", "5.3.1")
+    implementation("org.springframework.boot", "spring-boot-starter-web")
 
-    implementation("org.slf4j", "slf4j-simple", "2.0.6")
-    implementation("org.slf4j", "slf4j-api", "2.0.6")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
 
-    implementation("org.yaml:snakeyaml:1.33")
+    implementation("org.yaml", "snakeyaml", "1.33")
 }
