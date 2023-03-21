@@ -4,6 +4,7 @@ import de.baaasty.baaastyserver.database.DatabaseConnection;
 import de.baaasty.baaastyserver.database.dao.User;
 import de.chojo.sadu.base.QueryFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
